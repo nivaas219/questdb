@@ -74,6 +74,7 @@ public class UnorderedPageFrameSequence<T extends StatefulAtom> implements Close
     private final AtomicInteger cancelReason = new AtomicInteger(SqlExecutionCircuitBreaker.STATE_OK);
     private final MillisecondClock clock;
     private final SOUnboundedCountDownLatch doneLatch = new SOUnboundedCountDownLatch();
+    private final CairoEngine engine;
     private final StringSink errorMsg = new StringSink();
     private PageFrameAddressCache frameAddressCache;
     private final LongList frameRowCounts = new LongList();
@@ -117,6 +118,7 @@ public class UnorderedPageFrameSequence<T extends StatefulAtom> implements Close
     ) {
         try {
             this.atom = atom;
+            this.engine = engine;
             this.frameAddressCache = new PageFrameAddressCache();
             this.reducer = reducer;
             this.clock = configuration.getMillisecondClock();
@@ -302,6 +304,10 @@ public class UnorderedPageFrameSequence<T extends StatefulAtom> implements Close
 
     public SOUnboundedCountDownLatch getDoneLatch() {
         return doneLatch;
+    }
+
+    public CairoEngine getEngine() {
+        return engine;
     }
 
     public int getFrameCount() {

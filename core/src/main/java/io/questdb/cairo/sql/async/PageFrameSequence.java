@@ -64,6 +64,7 @@ public class PageFrameSequence<T extends StatefulAtom> implements Closeable {
     private static final Log LOG = LogFactory.getLog(PageFrameSequence.class);
     private final AtomicInteger cancelReason = new AtomicInteger(SqlExecutionCircuitBreaker.STATE_OK);
     private final MillisecondClock clock;
+    private final CairoEngine engine;
     private final LongList frameRowCounts = new LongList();
     private final PageFrameReduceTaskFactory localTaskFactory;
     private final MessageBus messageBus;
@@ -115,6 +116,7 @@ public class PageFrameSequence<T extends StatefulAtom> implements Closeable {
     ) {
         try {
             this.atom = atom;
+            this.engine = engine;
             this.frameAddressCache = new PageFrameAddressCache();
             this.messageBus = messageBus;
             this.reducer = reducer;
@@ -253,6 +255,10 @@ public class PageFrameSequence<T extends StatefulAtom> implements Closeable {
     // warning: the circuit breaker may be thread unsafe, so don't use it concurrently
     public SqlExecutionCircuitBreaker getCircuitBreaker() {
         return sqlExecutionContext.getCircuitBreaker();
+    }
+
+    public CairoEngine getEngine() {
+        return engine;
     }
 
     public int getFrameCount() {

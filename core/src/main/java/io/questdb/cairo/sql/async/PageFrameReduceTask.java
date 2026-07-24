@@ -31,6 +31,7 @@ import io.questdb.cairo.sql.PageFrameAddressCache;
 import io.questdb.cairo.sql.PageFrameMemory;
 import io.questdb.cairo.sql.PageFrameMemoryPool;
 import io.questdb.cairo.sql.PartitionFormat;
+import io.questdb.cairo.sql.SqlExecutionCircuitBreaker;
 import io.questdb.cairo.sql.StatefulAtom;
 import io.questdb.std.DirectLongList;
 import io.questdb.std.FlyweightMessageContainer;
@@ -300,6 +301,14 @@ public class PageFrameReduceTask implements QuietCloseable, Mutable {
     public void releaseFrameMemory() {
         frameMemoryPool.releaseParquetBuffers();
         frameMemory = null;
+    }
+
+    /**
+     * Pushes the query's cancel handle down to the frame memory pool's parquet
+     * decoder, so a decode that blocks waiting for data can be cancelled.
+     */
+    public void setCancelHandle(SqlExecutionCircuitBreaker cancelHandle) {
+        frameMemoryPool.setCancelHandle(cancelHandle);
     }
 
     public void setErrorMsg(Throwable th) {
